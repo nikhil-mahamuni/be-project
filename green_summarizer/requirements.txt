@@ -1,0 +1,5 @@
+kivy==2.3.0
+kivymd==1.1.1
+pypdf==4.0.0
+networkx==3.2.1
+fpdf==1.7.2
