@@ -1,5 +1,7 @@
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
+*.pyd
 *$py.class
 
 # OS generated files
@@ -17,10 +19,11 @@ dist/
 *.egg-info/
 .buildozer/
 bin/
+*.apk
+*.aab
 
 # Database
-history.db
-test_history.db
+*.db
 
 # Virtual environments
 .env
@@ -33,3 +36,6 @@ venv.bak/
 
 # Logs
 *.log
+
+# pytest
+.pytest_cache/

@@ -131,7 +131,7 @@ class PDFScreen(MDScreen):
             try:
                 ratio = float(self.app.settings.get('default_ratio', '0.3'))
                 if ratio < 0.05: ratio = 0.05
-                if ratio > 0.8: ratio = 0.8
+                if ratio > 0.80: ratio = 0.80
             except ValueError:
                 ratio = 0.3
 

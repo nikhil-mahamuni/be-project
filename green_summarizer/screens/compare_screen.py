@@ -83,6 +83,8 @@ class CompareScreen(MDScreen):
 
             try:
                 ratio = float(self.app.settings.get('default_ratio', '0.3'))
+                if ratio < 0.05: ratio = 0.05
+                if ratio > 0.80: ratio = 0.80
             except ValueError:
                 ratio = 0.3
 
@@ -93,9 +95,13 @@ class CompareScreen(MDScreen):
                 summarizer = SummarizerFactory.get_summarizer(model_name)
                 res = summarizer.summarize(cleaned_text, ratio)
 
+                batt_cap = float(self.app.settings.get('battery_capacity', '4000'))
+                grid_fac = float(self.app.settings.get('grid_factor', '708.2'))
                 metrics = self.app.profiler.stop(
                     compression_ratio=res.compression_ratio,
                     output_words=res.output_word_count,
+                    grid_factor=grid_fac,
+                    capacity_mah=batt_cap
                 )
                 res.processing_time_seconds = metrics['duration_seconds']
                 results[model_name] = {'res': res, 'metrics': metrics}
@@ -118,25 +124,37 @@ class CompareScreen(MDScreen):
         self.btn_compare.disabled = False
         self.toolbar.title = "Compare Models"
 
-        # Latency Chart
-        self.results_content.add_widget(MDLabel(text="Processing Time (Seconds)", font_style="Subtitle1", bold=True, size_hint_y=None, height="30dp"))
-        latency_data = {m: d['metrics']['duration_seconds'] for m, d in results.items()}
-        self.results_content.add_widget(SimpleBarChart(data=latency_data))
-
-        # Energy Chart
-        self.results_content.add_widget(MDLabel(text="Energy Estimated (Joules)", font_style="Subtitle1", bold=True, size_hint_y=None, height="30dp"))
-        energy_data = {m: d['metrics']['energy_joules'] for m, d in results.items()}
-        self.results_content.add_widget(SimpleBarChart(data=energy_data))
-
-        # Efficiency Chart
-        self.results_content.add_widget(MDLabel(text="Efficiency Score (0-100)", font_style="Subtitle1", bold=True, size_hint_y=None, height="30dp"))
-        eff_data = {m: d['metrics']['efficiency_score'] for m, d in results.items()}
-        self.results_content.add_widget(SimpleBarChart(data=eff_data))
-
         # Recommendations
+        latency_data = {m: d['metrics']['duration_seconds'] for m, d in results.items()}
+        energy_data = {m: d['metrics']['energy_joules'] for m, d in results.items()}
+        eff_data = {m: d['metrics']['efficiency_score'] for m, d in results.items()}
+
         best_time = min(latency_data, key=latency_data.get)
+        best_energy = min(energy_data, key=energy_data.get)
         best_eff = max(eff_data, key=eff_data.get)
 
         from widgets.model_card import ModelCard
-        self.results_content.add_widget(ModelCard("Fastest Model", f"{best_time} ({latency_data[best_time]:.3f} s)"))
-        self.results_content.add_widget(ModelCard("Most Efficient", f"{best_eff} (Score: {eff_data[best_eff]:.1f})"))
+        self.results_content.add_widget(ModelCard("🏆 Recommended Model", f"{best_eff} (Efficiency Score: {eff_data[best_eff]:.1f}/100)"))
+        self.results_content.add_widget(ModelCard("⚡ Fastest Speed", f"{best_time} ({latency_data[best_time]:.3f} s)"))
+        self.results_content.add_widget(ModelCard("🔋 Lowest Energy", f"{best_energy} ({energy_data[best_energy]:.4f} Joules)"))
+
+        # Detailed Stats for each
+        self.results_content.add_widget(MDLabel(text="Detailed Results", font_style="H6", bold=True, size_hint_y=None, height="40dp"))
+
+        for m, d in results.items():
+            metrics = d['metrics']
+            res = d['res']
+            desc = (
+                f"Words: {res.input_word_count} -> {res.output_word_count} ({res.compression_ratio*100:.1f}%)\n"
+                f"Time: {metrics['duration_seconds']:.3f} s | Energy: {metrics['energy_joules']:.4f} J\n"
+                f"Carbon: {metrics['carbon_gco2e']:.5f} gCO2e | Data: {metrics['data_used_bytes']} bytes\n"
+                f"Efficiency Score: {metrics['efficiency_score']:.1f}"
+            )
+            self.results_content.add_widget(ModelCard(m, desc))
+
+        # Charts
+        self.results_content.add_widget(MDLabel(text="Processing Time (Seconds)", font_style="Subtitle1", bold=True, size_hint_y=None, height="30dp"))
+        self.results_content.add_widget(SimpleBarChart(data=latency_data))
+
+        self.results_content.add_widget(MDLabel(text="Efficiency Score (0-100)", font_style="Subtitle1", bold=True, size_hint_y=None, height="30dp"))
+        self.results_content.add_widget(SimpleBarChart(data=eff_data))

@@ -50,7 +50,7 @@ class AnalyticsScreen(MDScreen):
         avg_latency = sum(h.duration_seconds for h in history) / total_summaries
 
         models = [h.model_name for h in history]
-        most_used_model = Counter(models).most_common(1)[0][0]
+        most_used_model = Counter(models).most_common(1)[0][0] if models else "N/A"
 
         # Grid
         from kivymd.uix.gridlayout import MDGridLayout

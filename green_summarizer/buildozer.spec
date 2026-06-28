@@ -1,15 +1,17 @@
 [app]
 title = GreenSummarizer
 package.name = greensummarizer
-package.domain = org.greensummarizer
+package.domain = com.greensummarizer
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0.0
-requirements = python3,kivy==2.3.0,kivymd==1.1.1,pypdf==4.0.0,networkx==3.2.1
+# Include pyjnius for Android battery APIs
+requirements = python3,kivy==2.3.0,kivymd==1.1.1,pypdf==4.0.0,networkx==3.2.1,pyjnius
 orientation = portrait
 osx.python_version = 3
 osx.kivy_version = 2.3.0
 fullscreen = 0
+# No INTERNET permission needed. Storage permissions required to read PDFs.
 android.permissions = READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
 android.api = 33
 android.minapi = 21

@@ -118,7 +118,7 @@ class TextScreen(MDScreen):
         try:
             ratio = float(self.field_ratio.text)
             if ratio < 0.05: ratio = 0.05
-            if ratio > 0.8: ratio = 0.8
+            if ratio > 0.80: ratio = 0.80
         except ValueError:
             ratio = float(self.app.settings.get('default_ratio', '0.3'))
 
