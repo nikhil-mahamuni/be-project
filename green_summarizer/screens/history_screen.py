@@ -44,8 +44,32 @@ class HistoryCard(MDCard):
         self.parent_screen.refresh()
 
     def on_release(self):
-        # Could show full detail, but for now just simple action
-        pass
+        from storage.models import SummaryResult
+        # Reconstruct a SummaryResult object to pass to the ResultScreen
+        result = SummaryResult(
+            summary_text=self.entry.summary_text,
+            model_name=self.entry.model_name,
+            input_word_count=self.entry.input_word_count,
+            output_word_count=self.entry.output_word_count,
+            compression_ratio=self.entry.compression_ratio,
+            sentence_count=0, # not saved in history explicitly, but 0 is fine
+            keywords=[],
+            processing_time_seconds=self.entry.duration_seconds
+        )
+
+        metrics = {
+            'duration_seconds': self.entry.duration_seconds,
+            'data_used_bytes': self.entry.data_used_bytes,
+            'battery_delta_percent': self.entry.battery_delta_percent,
+            'energy_joules': self.entry.energy_joules,
+            'energy_wh': self.entry.energy_wh,
+            'carbon_gco2e': self.entry.carbon_gco2e,
+            'efficiency_score': self.entry.efficiency_score,
+            'is_estimated': True
+        }
+
+        self.app.screens['result'].show_result(result, metrics)
+        self.app.switch_screen("result")
 
 class HistoryScreen(MDScreen):
     def __init__(self, app, **kwargs):

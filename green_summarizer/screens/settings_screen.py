@@ -34,9 +34,22 @@ class SettingsScreen(MDScreen):
         content = MDBoxLayout(orientation="vertical", padding="20dp", spacing="20dp", size_hint_y=None)
         content.bind(minimum_height=content.setter('height'))
 
+        # Default Model Selector
+        from summarizers.factory import SummarizerFactory
+        self.models = SummarizerFactory.get_available_models()
+        self.selected_model = self.app.settings.get('default_model', 'Hybrid Green Mode')
+        if self.selected_model not in self.models:
+            self.selected_model = "Hybrid Green Mode"
+
+        model_box = MDBoxLayout(orientation="horizontal", size_hint_y=None, height="70dp")
+        model_box.add_widget(MDLabel(text="Default Model:", font_style="Subtitle2", size_hint_x=0.4))
+        self.btn_model = MDFlatButton(text=self.selected_model, size_hint_x=0.6, on_release=self.open_model_menu)
+        model_box.add_widget(self.btn_model)
+        content.add_widget(model_box)
+
         # Default Ratio
         ratio_box = MDBoxLayout(orientation="vertical", size_hint_y=None, height="70dp")
-        ratio_box.add_widget(MDLabel(text="Default Summary Ratio (0.1 - 0.9)", font_style="Subtitle2"))
+        ratio_box.add_widget(MDLabel(text="Default Summary Ratio (0.05 - 0.80)", font_style="Subtitle2"))
         self.field_ratio = MDTextField(text=str(self.app.settings.get('default_ratio', '0.3')))
         ratio_box.add_widget(self.field_ratio)
         content.add_widget(ratio_box)
@@ -77,6 +90,28 @@ class SettingsScreen(MDScreen):
         main_layout.add_widget(scroll)
         self.add_widget(main_layout)
 
+    def open_model_menu(self, instance):
+        if not hasattr(self, 'menu'):
+            from kivymd.uix.menu import MDDropdownMenu
+            menu_items = [
+                {
+                    "text": m,
+                    "viewclass": "OneLineListItem",
+                    "on_release": lambda x=m: self.model_menu_callback(x),
+                } for m in self.models
+            ]
+            self.menu = MDDropdownMenu(
+                caller=self.btn_model,
+                items=menu_items,
+                width_mult=4,
+            )
+        self.menu.open()
+
+    def model_menu_callback(self, text_item):
+        self.selected_model = text_item
+        self.btn_model.text = self.selected_model
+        self.menu.dismiss()
+
     def save_settings(self, instance):
         try:
             ratio = float(self.field_ratio.text)
@@ -95,6 +130,7 @@ class SettingsScreen(MDScreen):
             self.app.settings.set('default_ratio', str(ratio))
             self.app.settings.set('battery_capacity', str(batt))
             self.app.settings.set('grid_factor', str(grid))
+            self.app.settings.set('default_model', self.selected_model)
 
             # Show toast or simple label
             self.toolbar.title = "Settings Saved!"

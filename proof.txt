@@ -1,0 +1,102 @@
+GreenSummarizer Final Proof:
+----------------------------
+
+1. File Tree (No db/cache/test artifacts):
+.
+├── README.md
+├── green_summarizer
+│   ├── __init__.py
+│   ├── app
+│   │   ├── __init__.py
+│   │   └── app.py
+│   ├── buildozer.spec
+│   ├── documents
+│   │   ├── __init__.py
+│   │   ├── chunker.py
+│   │   ├── pdf_extractor.py
+│   │   └── text_cleaner.py
+│   ├── main.py
+│   ├── metrics
+│   │   ├── __init__.py
+│   │   ├── battery.py
+│   │   ├── carbon.py
+│   │   ├── efficiency.py
+│   │   ├── energy.py
+│   │   ├── network.py
+│   │   └── profiler.py
+│   ├── requirements.txt
+│   ├── screens
+│   │   ├── __init__.py
+│   │   ├── analytics_screen.py
+│   │   ├── compare_screen.py
+│   │   ├── history_screen.py
+│   │   ├── home_screen.py
+│   │   ├── pdf_screen.py
+│   │   ├── result_screen.py
+│   │   ├── settings_screen.py
+│   │   └── text_screen.py
+│   ├── storage
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   │   ├── models.py
+│   │   └── settings_store.py
+│   ├── summarizers
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── factory.py
+│   │   ├── frequency_rank.py
+│   │   ├── hybrid_green.py
+│   │   ├── textrank.py
+│   │   └── tfidf_rank.py
+│   ├── utils
+│   │   ├── __init__.py
+│   │   ├── constants.py
+│   │   ├── file_utils.py
+│   │   ├── text_utils.py
+│   │   └── time_utils.py
+│   └── widgets
+│       ├── __init__.py
+│       ├── chart_widgets.py
+│       ├── metric_card.py
+│       ├── model_card.py
+│       └── summary_card.py
+└── tests
+    ├── __init__.py
+    ├── test_documents.py
+    ├── test_metrics.py
+    ├── test_storage.py
+    └── test_summarizers.py
+
+2. Pytest Output:
+============= test session starts =============
+platform linux -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+collected 13 items
+
+tests/test_documents.py ...             [ 23%]
+tests/test_metrics.py ....              [ 53%]
+tests/test_storage.py ..                [ 69%]
+tests/test_summarizers.py ....          [100%]
+
+============= 13 passed in 0.50s ==============
+
+3. Desktop Smoke Test:
+Smoke Test Successful
+(UI headless boot succeeds with Kivy 2.3.0 sdl2 Window)
+
+4. Removed Generated Files:
+- green_summarizer/history.db
+- test_history.db
+- test_dummy2.pdf
+- test_chunker_debug.py
+- All __pycache__ directories.
+
+5. Known Limitations:
+- Battery/power/carbon values are estimates (depends on Android API capabilities).
+- Exact power measurement depends on Android device support.
+- MVP supports text-based PDFs. Scanned PDFs need OCR in the future.
+- Summarization is extractive offline in pure Python MVP.
+
+6. Android APK Build Status:
+- Desktop MVP complete and tested.
+- Android APK build pending.

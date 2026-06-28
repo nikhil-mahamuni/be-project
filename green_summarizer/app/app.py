@@ -27,9 +27,15 @@ class GreenSummarizerApp(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_hue = "700"
 
+        import os
+
+        # In Android, DB_PATH might be read-only if it's in the app source root.
+        # We use the app's user_data_dir for the persistent database location.
+        actual_db_path = os.path.join(self.user_data_dir, 'history.db')
+
         # Initialize Core Systems
-        self.db = Database(DB_PATH)
-        self.settings = SettingsStore(DB_PATH)
+        self.db = Database(actual_db_path)
+        self.settings = SettingsStore(actual_db_path)
 
         # Set default settings if not exists
         if not self.settings.get('default_ratio'):
